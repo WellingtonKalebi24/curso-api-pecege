@@ -16,7 +16,7 @@ export class Shelter {
     @Prop({required: true })
     createdAt: Date
     @Prop({required: true })
-    updateAt: Date
+    updatedAt: Date
 
 
 }
