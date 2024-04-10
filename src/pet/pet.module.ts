@@ -2,12 +2,26 @@ import { Module } from '@nestjs/common';
 import { PetController } from './pet.controller';
 import PetTokens from './pet.tokens';
 import CreatePetUseCase from './usecases/create.pet.usecase';
+import PetRepository from './pet.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Pet, PetSchemas } from './schemas/pet.schemas';
+import GetPetByIdUseCase from './usecases/get.pet.by.id.usecase';
 
 @Module({
   controllers: [PetController],
+  imports: [MongooseModule.forFeature([{ name: Pet.name, schema: PetSchemas}])],
   providers: [{
     provide: PetTokens.createPetUseCase,
     useClass: CreatePetUseCase
-  }]
+  },
+  {
+    provide: PetTokens.petRepository,
+    useClass: PetRepository
+  },
+  {
+    provide: PetTokens.getPetByIdUseCase,
+    useClass: GetPetByIdUseCase
+  }
+]
 })
 export class PetModule {}
