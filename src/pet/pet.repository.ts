@@ -11,6 +11,7 @@ export default class PetRepository implements IPetRepository {
         @InjectModel(Pet.name)
         private readonly petModel: Model<Pet>,
     ){}
+    //delete: any;
 
     async getById(id: string): Promise<Pet> {
         return await this.petModel.findById(id)
@@ -24,12 +25,17 @@ export default class PetRepository implements IPetRepository {
     }
 
     async updateById(data: Partial<Pet>): Promise<void> {
-        await(this.petModel).updateOne({
-            _id: data._id
-        }, {
-            ...data,
-            updatedAt: new Date()
-        }
-    ) 
-    } 
+            await(this.petModel).updateOne({
+                _id: data._id
+            }, {
+                ...data,
+                updatedAt: new Date()
+            }
+        ) 
+    }
+
+    async deletePetById(id: string) : Promise<void> {
+        await this.petModel.findByIdAndDelete(id)
+    }
+    
 }
