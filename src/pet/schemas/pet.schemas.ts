@@ -39,4 +39,4 @@ export class Pet {
     updatedAt: Date;
 }
 
-export const PetSchemas = SchemaFactory.createForClass(Pet);
+export const PetSchema = SchemaFactory.createForClass(Pet);

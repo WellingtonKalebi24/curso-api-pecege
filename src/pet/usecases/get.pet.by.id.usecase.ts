@@ -3,10 +3,19 @@ import GetPetByIdUseCaseInput from "./dtos/get.pet.usecase.input";
 import GetPetByIdUseCaseOutput from "./dtos/get.pet.usecase.output";
 import { Pet } from "../schemas/pet.schemas";
 import PetNotFoundError from "src/domain/erros/pet.not.foud.error";
+import { Inject, Injectable } from "@nestjs/common";
+import PetTokens from "../pet.tokens";
+import IPetRepository from "../interface/pet.repository.interface";
 
-
+Injectable()
 export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInput, GetPetByIdUseCaseOutput> {
-    petRepository: any;
+    
+
+    constructor(
+        @Inject(PetTokens.petRepository)
+        private readonly petRepository: IPetRepository
+    ) {}
+
     async run(input: GetPetByIdUseCaseInput): Promise<GetPetByIdUseCaseOutput> {
        const pet = await this.getPetById(input.id)
 
@@ -28,7 +37,7 @@ export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInpu
     }
     private async getPetById(id: string): Promise<Pet> {
         try {
-            return await this.petRepository.getPetById(id) 
+            return await this.petRepository.getById(id) 
         } catch (error) {
             return null
         }
