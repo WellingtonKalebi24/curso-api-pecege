@@ -6,6 +6,9 @@ import PetNotFoundError from "src/domain/erros/pet.not.foud.error";
 import { Inject, Injectable } from "@nestjs/common";
 import PetTokens from "../pet.tokens";
 import IPetRepository from "../interface/pet.repository.interface";
+import AppTokens from "src/app.tokens";
+import IFileService from "src/interfaces/file.service.interface";
+import path from "path";
 
 Injectable()
 export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInput, GetPetByIdUseCaseOutput> {
@@ -13,7 +16,10 @@ export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInpu
 
     constructor(
         @Inject(PetTokens.petRepository)
-        private readonly petRepository: IPetRepository
+        private readonly petRepository: IPetRepository,
+        
+        @Inject(AppTokens.fileService)
+        private readonly fileService: IFileService,
     ) {}
 
     async run(input: GetPetByIdUseCaseInput): Promise<GetPetByIdUseCaseOutput> {
@@ -22,6 +28,8 @@ export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInpu
        if(pet === null) {
         throw new PetNotFoundError()
        }
+console.log(pet)
+       const petPhoto = !!pet.photo ? (await this.fileService.readfile(pet.photo)).toString('base64') : null;
 
        return new GetPetByIdUseCaseOutput({
         id: pet._id,
@@ -30,7 +38,7 @@ export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInpu
         size: pet.size,
         gender: pet.gender,
         bio: pet.bio,
-        photo: pet.photo,
+        photo: petPhoto,
         createdAt: pet.createdAt,
         updatedAt: pet.updatedAt,
        })
