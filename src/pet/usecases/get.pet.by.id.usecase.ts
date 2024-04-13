@@ -8,7 +8,6 @@ import PetTokens from "../pet.tokens";
 import IPetRepository from "../interface/pet.repository.interface";
 import AppTokens from "src/app.tokens";
 import IFileService from "src/interfaces/file.service.interface";
-import path from "path";
 
 Injectable()
 export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInput, GetPetByIdUseCaseOutput> {
@@ -28,7 +27,7 @@ export default class GetPetByIdUseCase implements IUseCase<GetPetByIdUseCaseInpu
        if(pet === null) {
         throw new PetNotFoundError()
        }
-console.log(pet)
+//console.log(pet)
        const petPhoto = !!pet.photo ? (await this.fileService.readfile(pet.photo)).toString('base64') : null;
 
        return new GetPetByIdUseCaseOutput({

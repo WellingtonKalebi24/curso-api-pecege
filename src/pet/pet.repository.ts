@@ -3,6 +3,8 @@ import IPetRepository from "./interface/pet.repository.interface";
 import { Pet } from "./schemas/pet.schemas";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import FindByFilterAndTotal from "./usecases/dtos/findy.by.filter.and.total";
+import GetPetsUseCaseInput from "./usecases/dtos/get.pets.usecase.input";
 
 @Injectable()
 export default class PetRepository implements IPetRepository {
@@ -11,7 +13,36 @@ export default class PetRepository implements IPetRepository {
         @InjectModel(Pet.name)
         private readonly petModel: Model<Pet>,
     ){}
-    //delete: any;
+    async findByFilter(input: GetPetsUseCaseInput): Promise<FindByFilterAndTotal> {
+       
+        const FIRST_PAGE = 1;
+        const skip = input.page == FIRST_PAGE ? 0 : input.itemsPerPage * (input.page - 1);
+
+        let query = this.petModel.find();
+
+        if (input.page) {
+            query = query.find({ type : input.type});
+        }
+
+        if (input.size) {
+            query = query.find({ size: input.size});
+        }
+
+        if (input.gender) {
+            query = query.find({ gender: input.gender});
+        }
+
+
+        const totalQuery = query.clone().countDocuments();
+        const skipQuery = query.clone().skip(skip).limit(input.itemsPerPage);
+
+        const [items, total] = await Promise.all([
+            skipQuery.exec(),
+            totalQuery.exec()
+        ]);
+
+        return new FindByFilterAndTotal({items, total})
+    }
 
     async getById(id: string): Promise<Pet> {
         return await this.petModel.findById(id)
